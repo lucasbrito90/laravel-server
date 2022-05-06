@@ -18,6 +18,10 @@ RUN apk update && apk add \
     zip \
     unzip
 
+#Configura nginx
+COPY ./.deploy/default-prod.conf /etc/nginx/conf.d/default.conf
+RUN mkdir /run/nginx/
+
 # Install PHP extensions
 RUN docker-php-ext-install mbstring exif pcntl bcmath gd
 
@@ -29,8 +33,8 @@ RUN rm -rf composer.lock
 RUN cp .env.prod .env
 RUN chown -R www-data:www-data .
 RUN composer install --optimize-autoloader --no-dev
+RUN ["chmod", "+x", "./entrypoint.sh"]
 
 # Init entrypoint (nginx and php-fpm)
-CMD php artisan serve --host=0.0.0.0 --port=80
-
+CMD ["./entrypoint.sh"]
 EXPOSE 80
