@@ -33,8 +33,7 @@ RUN rm -rf composer.lock
 RUN cp .env.prod .env
 RUN chown -R www-data:www-data .
 RUN composer install --optimize-autoloader --no-dev
-RUN ["chmod", "+x", "./entrypoint.sh"]
 
 # Init entrypoint (nginx and php-fpm)
-CMD ["./entrypoint.sh"]
+ENTRYPOINT sh -c "php-fpm -D; nginx -g 'daemon off;'"
 EXPOSE 80

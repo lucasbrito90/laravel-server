@@ -14,3 +14,7 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/healthy', function () {
+    return response(["status" => 200], 200);
+});
