@@ -1,11 +1,11 @@
-FROM php:7.2-fpm-alpine
+FROM php:7.2-fpm-alpine3.11
 
 #Diretorio Atual e remove pasta html caso seja criada
 WORKDIR /var/www
 RUN rm  -rf /var/www/html
 
 #Baixa as dependencias
-RUN apk update && apk add --no-cahe --virtual\
+RUN apk update && apk add --no-cache \
     nginx \
     git \
     curl \
@@ -21,7 +21,7 @@ RUN docker-php-ext-install mbstring exif pcntl bcmath gd
 #Baixa e instala o composer
 COPY composer.json .
 COPY --from=composer:latest  /usr/bin/composer /usr/bin/composer
-RUN composer install --optimize-autoloader --no-dev
+RUN composer install --no-dev --no-autoloader
 
 #Configura nginx
 COPY ./.deploy/default-prod.conf /etc/nginx/conf.d/default.conf
@@ -33,9 +33,11 @@ COPY . .
 #Executa comandos necessários
 RUN cp .env.prod .env
 RUN chown -R www-data:www-data .
+RUN composer dump-autoload
 RUN ["chmod", "+x", "./entrypoint.sh"]
 
 # Init entrypoint (nginx and php-fpm)
 CMD ["./entrypoint.sh"]
+
 
 EXPOSE 80
